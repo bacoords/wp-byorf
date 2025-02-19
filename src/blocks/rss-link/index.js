@@ -7,7 +7,7 @@ const Edit = () => {
   const baseUrl = `${window.location.protocol}//${window.location.host}/feed/`;
 
   return (
-    <div className="wp-byorf-rss-link">
+    <div className="wp-block-byorf-rss-link">
       <a href={baseUrl} id="byorf_link">
         {baseUrl}
       </a>

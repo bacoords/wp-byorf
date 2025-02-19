@@ -16,7 +16,7 @@
 
 	$href = get_bloginfo( 'rss2_url' );
 	printf(
-		'<div class="wp-byorf-rss-link"><a id="byorf_link" href="%s">%s</a></div>',
+		'<div class="wp-block-byorf-rss-link"><a id="byorf_link" href="%s">%s</a></div>',
 		esc_url( $href ),
 		esc_html( $href )
 	);

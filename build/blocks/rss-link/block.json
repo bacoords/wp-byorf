@@ -13,5 +13,5 @@
   "textdomain": "wp-byorf",
   "editorScript": "file:./index.js",
   "render": "file:./render.php",
-  "editorStyle": "file:./index.scss"
+  "editorStyle": "file:./index.css"
 }
