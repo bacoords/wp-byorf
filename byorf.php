@@ -190,52 +190,39 @@ function byorf_parents( &$array ) {
 	return '<script>byorf_children = ' . json_encode( $tree ) . ';</script>';
 }
 
+// Move the comparison function outside, with a unique name
+function byorf_term_compare($a, $b) {
+	if ($a->parent < $b->parent) {
+		return -1;
+	}
+	if ($a->parent > $b->parent) {
+		return 1;
+	}
 
-function byorf_terms( $attr = '' ) {
+	if ($a->name < $b->name) {
+		return -1;
+	}
+	if ($a->name > $b->name) {
+		return 1;
+	}
 
-	// $args = array(
-	// 'taxonomy' => 'category',
-	// 'orderby' => 'parent,name',
-	// 'hide_empty' => false
-	// );
+	if ($a->term_id < $b->term_id) {
+		return -1;
+	}
+	if ($a->term_id > $b->term_id) {
+		return 1;
+	}
+	return 0;
+}
 
-	$args               = wp_parse_args( $attr );
-	$args['taxonomy']   = 'category';
-	$args['orderby']    = 'parent,name';
+function byorf_terms($attr = '') {
+	$args = wp_parse_args($attr);
+	$args['taxonomy'] = 'category';
+	$args['orderby'] = 'parent,name';
 	$args['hide_empty'] = false;
 
-	$array = get_terms( $args );
-	function cmp( $a, $b ) {
-		if ( $a->parent < $b->parent ) {
-			return -1;
-		}
-		if ( $a->parent > $b->parent ) {
-			return 1;
-		}
-
-		if ( $a->name < $b->name ) {
-			return -1;
-		}
-		if ( $a->name > $b->name ) {
-			return 1;
-		}
-
-		if ( $a->term_id < $b->term_id ) {
-			return -1;
-		}
-		if ( $a->term_id > $b->term_id ) {
-			return 1;
-		}
-		return 0;
-	}
-	// function map($a) {
-	// return array(
-	// 'name' => $a->name,
-	// 'term_id' => $a->term_id,
-	// 'parent' => $a->parent
-	// );
-	// }
-	usort( $array, 'cmp' );
+	$array = get_terms($args);
+	usort($array, 'byorf_term_compare');  // Use the renamed function
 	return $array;
 }
 
