@@ -27,14 +27,14 @@ function byorf_rebuild(e) {
 
   const list = checkedBoxes.map((x) => x.value).sort();
   let href = rssUrl;
+  const url = new URL(rssUrl);
   if (list.length) {
-    const url = new URL(rssUrl);
     url.searchParams.set("cat", list.join(","));
-    href = url.toString();
   } else {
-    // When no categories are selected, use the base URL without parameters
-    href = new URL(rssUrl).origin + new URL(rssUrl).pathname;
+    // When no categories are selected, remove only the cat parameter
+    url.searchParams.delete("cat");
   }
+  href = url.toString();
 
   const linkElement = document.getElementById("byorf_link");
   linkElement.href = href;

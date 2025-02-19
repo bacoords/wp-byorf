@@ -1,6 +1,7 @@
 import { registerBlockType } from "@wordpress/blocks";
 import { __ } from "@wordpress/i18n";
 import metadata from "./block.json";
+import "./editor.scss";
 
 const Edit = () => {
   const baseUrl = `${window.location.protocol}//${window.location.host}/feed/`;
