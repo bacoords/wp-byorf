@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "wp-byorf/rss-link",
+  "version": "1.0.0",
+  "title": "RSS Feed Link",
+  "category": "widgets",
+  "icon": "rss",
+  "description": "Display a dynamic RSS feed link",
+  "supports": {
+    "html": false
+  },
+  "textdomain": "wp-byorf",
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}

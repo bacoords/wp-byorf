@@ -1,0 +1,13 @@
+{
+    "name": "wp-byorf",
+    "version": "1.0.0",
+    "description": "Build Your Own RSS Feed WordPress Plugin",
+    "scripts": {
+        "build": "wp-scripts build",
+        "start": "wp-scripts start",
+        "packages-update": "wp-scripts packages-update"
+    },
+    "devDependencies": {
+        "@wordpress/scripts": "^27.0.0"
+    }
+}

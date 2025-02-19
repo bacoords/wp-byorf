@@ -1,0 +1,23 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "wp-byorf/category-tree",
+    "version": "1.0.0",
+    "title": "RSS Category Tree",
+    "category": "widgets",
+    "icon": "list-view",
+    "description": "Display a category tree for building custom RSS feeds",
+    "attributes": {
+        "excludeCategories": {
+            "type": "string",
+            "default": ""
+        }
+    },
+    "supports": {
+        "html": false
+    },
+    "textdomain": "wp-byorf",
+    "editorScript": "file:./index.js",
+    "render": "file:./render.php",
+    "viewScript": "file:./view.js"
+}

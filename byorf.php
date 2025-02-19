@@ -12,36 +12,40 @@ Version: 1.0
 */
 
 
-function byorf_form(&$array, $parent = 0){
+function byorf_form( &$array, $parent = 0 ) {
 	$rv = '';
 
 	$children = array();
-	foreach($array as &$item) {
-		if ($item->parent == $parent)
-			array_push($children, $item);
+	foreach ( $array as &$item ) {
+		if ( $item->parent == $parent ) {
+			array_push( $children, $item );
+		}
 	}
 
-	if (empty($children)) return $rv;
+	if ( empty( $children ) ) {
+		return $rv;
+	}
 
-	if ($parent == 0) {
+	if ( $parent == 0 ) {
 		$rv .= '<div><form id="byorf_form">';
 	}
 
 	$rv .= '<ul>';
-	foreach($children as &$item) {
-		$tmp = byorf_form($array, $item->term_id);
+	foreach ( $children as &$item ) {
+		$tmp = byorf_form( $array, $item->term_id );
 
-		#if ($parent == 0 && empty($tmp)) continue; // skip empty top-level.
-		
+		// if ($parent == 0 && empty($tmp)) continue; // skip empty top-level.
+
 		$rv .= '<li>';
 		$rv .= '<input type="checkbox"  value="' . $item->term_id . '" />';
-		$rv .= htmlspecialchars($item->name) . "\n";
-		if (!empty($tmp)) { $rv .= $tmp; }
+		$rv .= htmlspecialchars( $item->name ) . "\n";
+		if ( ! empty( $tmp ) ) {
+			$rv .= $tmp; }
 		$rv .= "</li>\n";
 	}
 	$rv .= "</ul>\n";
 
-	if ($parent == 0) {
+	if ( $parent == 0 ) {
 		$rv .= '</form></div>';
 	}
 	return $rv;
@@ -49,7 +53,7 @@ function byorf_form(&$array, $parent = 0){
 
 function byorf_js() {
 
-	$href = get_bloginfo('rss2_url');
+	$href = get_bloginfo( 'rss2_url' );
 	return <<<EOT
 <script>
 function byorf_rebuild(e){
@@ -135,140 +139,153 @@ jQuery(document).ready(function(){
 EOT;
 }
 
-function byorf_map(&$array) {
+function byorf_map( &$array ) {
 	$map = array();
 
-	foreach($array as &$item) {
-		$map[$item->term_id] = array(
+	foreach ( $array as &$item ) {
+		$map[ $item->term_id ] = array(
 			'term_id' => $item->term_id,
-			'parent' => $item->parent,
-			'name' => $item->name
+			'parent'  => $item->parent,
+			'name'    => $item->name,
 		);
 	}
 
-	return '<script>byorf_map = ' . json_encode($map) . ';</script>';
+	return '<script>byorf_map = ' . json_encode( $map ) . ';</script>';
 }
 
-function byorf_parents_helper(&$array, $parent, &$tree) {
+function byorf_parents_helper( &$array, $parent, &$tree ) {
 
 	$rv = array();
 
-	foreach($array as &$item) {
+	foreach ( $array as &$item ) {
 
-		if ($item->parent == $parent) {
-			$term_id = $item->term_id;
-			$tmp = byorf_parents_helper($array, $term_id, $tree);
-			$tree[$term_id] = $tmp;
-			foreach ($tmp as $x) { array_push($rv, $x); }
-			array_push($rv, $term_id);
+		if ( $item->parent == $parent ) {
+			$term_id          = $item->term_id;
+			$tmp              = byorf_parents_helper( $array, $term_id, $tree );
+			$tree[ $term_id ] = $tmp;
+			foreach ( $tmp as $x ) {
+				array_push( $rv, $x ); }
+			array_push( $rv, $term_id );
 		}
 	}
 	return $rv;
 }
 
-function byorf_parents(&$array) {
+function byorf_parents( &$array ) {
 
-	# build a tree, then invert it.
+	// build a tree, then invert it.
 
 	$tree = array();
-	byorf_parents_helper($array, 0, $tree);
+	byorf_parents_helper( $array, 0, $tree );
 
-#	$parents = array();
-#	foreach ($tree as $parent => $children) {
-#		# code...
-#		foreach ($children as $child) {
-#			if (isset($parents[$child])) array_push($parents[$child], $parent);
-#			else $parents[$child] = array($parent);
-#		}
-#	}
+	// $parents = array();
+	// foreach ($tree as $parent => $children) {
+	// code...
+	// foreach ($children as $child) {
+	// if (isset($parents[$child])) array_push($parents[$child], $parent);
+	// else $parents[$child] = array($parent);
+	// }
+	// }
 
-
-	return '<script>byorf_children = ' . json_encode($tree) . ';</script>';
-
+	return '<script>byorf_children = ' . json_encode( $tree ) . ';</script>';
 }
 
 
-function byorf_terms($attr = '') {
+function byorf_terms( $attr = '' ) {
 
 	// $args = array(
-	// 	'taxonomy' => 'category',
-	// 	'orderby' => 'parent,name',
-	// 	'hide_empty' => false
+	// 'taxonomy' => 'category',
+	// 'orderby' => 'parent,name',
+	// 'hide_empty' => false
 	// );
 
-	$args = wp_parse_args($attr);
-	$args['taxonomy'] = 'category';
-	$args['orderby'] = 'parent,name';
+	$args               = wp_parse_args( $attr );
+	$args['taxonomy']   = 'category';
+	$args['orderby']    = 'parent,name';
 	$args['hide_empty'] = false;
 
+	$array = get_terms( $args );
+	function cmp( $a, $b ) {
+		if ( $a->parent < $b->parent ) {
+			return -1;
+		}
+		if ( $a->parent > $b->parent ) {
+			return 1;
+		}
 
-	$array = get_terms($args);
-	function cmp($a, $b){
-		if ($a->parent < $b->parent) return -1;
-		if ($a->parent > $b->parent) return 1;
+		if ( $a->name < $b->name ) {
+			return -1;
+		}
+		if ( $a->name > $b->name ) {
+			return 1;
+		}
 
-		if ($a->name < $b->name) return -1;
-		if ($a->name > $b->name) return 1;
-
-		if ($a->term_id < $b->term_id) return -1;
-		if ($a->term_id > $b->term_id) return 1;
+		if ( $a->term_id < $b->term_id ) {
+			return -1;
+		}
+		if ( $a->term_id > $b->term_id ) {
+			return 1;
+		}
 		return 0;
 	}
-#	function map($a) {
-#		return array(
-#			'name' => $a->name,
-#			'term_id' => $a->term_id,
-#			'parent' => $a->parent
-#		);
-#	}
-	usort($array, 'cmp');
+	// function map($a) {
+	// return array(
+	// 'name' => $a->name,
+	// 'term_id' => $a->term_id,
+	// 'parent' => $a->parent
+	// );
+	// }
+	usort( $array, 'cmp' );
 	return $array;
 }
 
-function byorf($attr = '') {
+function byorf( $attr = '' ) {
 
-	$array = byorf_terms($attr);
+	$array = byorf_terms( $attr );
 
 	$html = array();
 
-	$href = get_bloginfo('rss2_url');
-	$html[] = byorf_form($array, 0);
+	$href   = get_bloginfo( 'rss2_url' );
+	$html[] = byorf_form( $array, 0 );
 	$html[] = '<div><a id="byorf_link" href="' . $href . '">' . $href . '</a></div>';
-	$html[] = byorf_map($array);
-	$html[] = byorf_parents($array);
+	$html[] = byorf_map( $array );
+	$html[] = byorf_parents( $array );
 	$html[] = byorf_js();
 
-	return implode("\n", $html);
+	return implode( "\n", $html );
 }
 
 function byorf_link() {
-	$href = get_bloginfo('rss2_url');
+	$href = get_bloginfo( 'rss2_url' );
 
 	return '<div><a id="byorf_link" href="' . $href . '">' . $href . '</a></div>';
 }
 
-function byorf_tree($attr = '') {
+function byorf_tree( $attr = '' ) {
 
-	$array = byorf_terms($attr);
+	$array = byorf_terms( $attr );
 
 	$html = array();
 
-	$href = get_bloginfo('rss2_url');
-	$html[] = byorf_form($array, 0);
-	$html[] = byorf_map($array);
-	$html[] = byorf_parents($array);
+	$href   = get_bloginfo( 'rss2_url' );
+	$html[] = byorf_form( $array, 0 );
+	$html[] = byorf_map( $array );
+	$html[] = byorf_parents( $array );
 	$html[] = byorf_js();
 
-	return implode("\n", $html);
-
+	return implode( "\n", $html );
 }
 
 
 function byorf_init() {
-	add_shortcode('byorf', 'byorf');
-	add_shortcode('byorf_link', 'byorf_link');
-	add_shortcode('byorf_tree', 'byorf_tree');
+	add_shortcode( 'byorf', 'byorf' );
+	add_shortcode( 'byorf_link', 'byorf_link' );
+	add_shortcode( 'byorf_tree', 'byorf_tree' );
 }
-add_action('init', 'byorf_init');
+add_action( 'init', 'byorf_init' );
 
-?>
+function wp_byorf_register_blocks() {
+	register_block_type( __DIR__ . '/build/blocks/category-tree' );
+	register_block_type( __DIR__ . '/build/blocks/rss-link' );
+}
+add_action( 'init', 'wp_byorf_register_blocks' );
